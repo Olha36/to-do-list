@@ -11,19 +11,27 @@ const ToDoList: React.FC = () => {
   const [toDoList, setToDoList] = useState<ToDo[]>([])
   const [titleInput, setTitleInput] = useState('')
   const [descriptionInput, setDescriptionInput] = useState('')
-  const [error, setError] = useState(false)
+  const [titleError, setTitleError] = useState(false)
+  const [descriptionError, setDescriptionError] = useState(false)
 
   const handleTitleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitleInput(event.target.value)
+    setTitleError(false) // reset title error when input changes
   }
 
   const handleDescriptionInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescriptionInput(event.target.value)
+    setDescriptionError(false) // reset description error when input changes
   }
   const handleCreateToDo = () => {
+    if (!titleInput) {
+        setTitleError(true)
+    }
+    if (!descriptionInput) {
+        setDescriptionError(true)
+    }
     if (!titleInput || !descriptionInput) {
-      setError(true)
-      return
+        return
     }
     const newToDo: ToDo = {
       id: toDoList.length + 1,
@@ -34,7 +42,6 @@ const ToDoList: React.FC = () => {
     setToDoList([...toDoList, newToDo])
     setTitleInput('')
     setDescriptionInput('')
-    setError(false)
   }
 
   const handleToDoClick = (id: number) => {
@@ -50,7 +57,8 @@ const ToDoList: React.FC = () => {
       <div className="parent" style={{ display: 'flex', justifyContent: 'space-evenly' }}>
         <div>
           <h5>Title:</h5>
-          <input type="text" value={titleInput} onChange={handleTitleInputChange} placeholder="enter title" required />
+          <input type="text" value={titleInput} onChange={handleTitleInputChange} placeholder="enter title" style={{ borderColor: titleError ? 'red' : undefined }} required />
+          {titleError && <p style={{ color: 'red' }}>This field is empty</p>}
         </div>
         <div>
           <h5>Description:</h5>
@@ -59,14 +67,15 @@ const ToDoList: React.FC = () => {
             value={descriptionInput}
             onChange={handleDescriptionInputChange}
             placeholder="enter description"
+            style={{ borderColor: descriptionError ? 'red' : undefined }}
             required
           />
+          {descriptionError && <p style={{ color: 'red' }}>This field is empty</p>}
         </div>
         <button style={{ width: 177, height: 21, alignSelf: 'flex-end' }} onClick={handleCreateToDo}>
           Create
         </button>
       </div>
-      {error && <p style={{ color: 'red' }}>This field is empty</p>}
       <ul>
         {toDoList.map((toDo) => (
           <li
